@@ -9,7 +9,7 @@ class DiGraph:
     """
     A class for representing directed graphs via their adjacency matrices.
 
-    PageRank vector can be computed using linearsolve, eigensolve, or iterrative solving methods. 
+    The page rank vector can be computed using linearsolve, eigensolve, or iterrative solving methods. 
     """
     def __init__(self, A, labels = None): 
         """

@@ -1,28 +1,20 @@
-# solutions.py
-"""Volume 1: The Page Rank Algorithm.
-<Name>
-<Class>
-<Date>
-"""
 
 import numpy as np
 import networkx as nx
 from itertools import combinations
 from scipy import linalg as la
 
-# Problems 1-2
+
 class DiGraph:
     """
     A class for representing directed graphs via their adjacency matrices.
 
-    Attributes:
-        (fill this out after completing DiGraph.__init__().)
+    PageRank vector can be computed using linearsolve, eigensolve, or iterrative solving methods. 
     """
-    # Problem 1
     def __init__(self, A, labels = None): 
         """
-        Modify A so that there are no sinks in the corresponding graph,
-        then calculate Ahat. Save Ahat and the labels as attributes.
+        Modifies A so that there are no sinks in the corresponding graph,
+        then calculates Ahat. Saves Ahat and the labels as attributes.
 
         Parameters:
             A ((n,n) ndarray): the adjacency matrix of a directed graph.
@@ -50,10 +42,9 @@ class DiGraph:
         self.labels = labels
         
         
-    # Problem 2
     def linsolve(self, epsilon=0.85):
         """
-        Compute the PageRank vector using the linear system method.
+        Computes the PageRank vector using the linear system method.
 
         Parameters:
             epsilon (float): the damping factor, between 0 and 1.
@@ -68,12 +59,10 @@ class DiGraph:
         # return dictionary mapping labels to probabilities
         return {self.labels[i]: p[i] for i in range(self.n)}
 
-
-    # Problem 2
     def eigensolve(self, epsilon=0.85):
         """
-        Compute the PageRank vector using the eigenvalue method.
-        Normalize the resulting eigenvector so its entries sum to 1.
+        Computes the PageRank vector using the eigenvalue method.
+        Normalizes the resulting eigenvector so its entries sum to 1.
 
         Parameters:
             epsilon (float): the damping factor, between 0 and 1.
@@ -91,10 +80,9 @@ class DiGraph:
         return {self.labels[i]: p[i] for i in range(self.n)}
         
         
-    # Problem 2
     def itersolve(self, epsilon=0.85, maxiter=100, tol=1e-12):
         """
-        Compute the PageRank vector using the iterative method.
+        Computes the PageRank vector using the iterative method.
 
         Parameters:
             epsilon (float): the damping factor, between 0 and 1.
@@ -123,10 +111,9 @@ class DiGraph:
 
 
 
-# Problem 3
 def get_ranks(d):
     """
-    Construct a sorted list of labels based on the PageRank vector.
+    Constructs a sorted list of labels based on the PageRank vector.
 
     Parameters:
         d (dict(str -> float)): a dictionary mapping labels to PageRank values.
@@ -134,19 +121,19 @@ def get_ranks(d):
     Returns:
         (list) the keys of d, sorted by PageRank value from greatest to least.
     """
-    labels, vals = list(d.keys()), list(d.values()) # get labels and values
-    return [labels[i] for i in np.flip(np.argsort(vals), axis = 0)] # return list mapping labels sorted by rank
-    
+    # get labels and values
+    labels, vals = list(d.keys()), list(d.values()) 
+    # return list mapping labels sorted by rank
+    return [labels[i] for i in np.flip(np.argsort(vals), axis = 0)] 
     
 
-# Problem 4
-def rank_websites(filename="web_stanford.txt", epsilon=0.85):
+def rank_websites(filename = "web_stanford.txt", epsilon = 0.85):
     """
-    Read the specified file and construct a graph where node j points to
-    node i if webpage j has a hyperlink to webpage i. Use the DiGraph class
+    Reads the specified file and constructs a graph where node j points to
+    node i if webpage j has a hyperlink to webpage i. Uses the DiGraph class
     and its itersolve() method to compute the PageRank values of the webpages,
-    then rank them with get_ranks(). If two webpages have the same rank,
-    resolve ties by listing the webpage with the larger ID number first.
+    then ranks them with get_ranks(). If two webpages have the same rank,
+    resolves ties by listing the webpage with the larger ID number first.
 
     Each line of the file has the format
         a/b/c/d/e/f...
@@ -175,9 +162,11 @@ def rank_websites(filename="web_stanford.txt", epsilon=0.85):
     labels = list(labels)
     labels.sort()
     
-    n = len(labels) # find total number of them and make A matrix
+    # find total number of them and make A matrix 
+    n = len(labels) 
     A = np.zeros((n, n))
-    indices = {key: i for i, key in enumerate(labels)} # maps keys to an index for matrix
+    # maps keys to an index for matrix
+    indices = {key: i for i, key in enumerate(labels)} 
     
     # updata A matrix based on how each site mapps to other sites
     for label in labels:
@@ -196,13 +185,12 @@ def rank_websites(filename="web_stanford.txt", epsilon=0.85):
     
     
 
-# Problem 5
 def rank_ncaa_teams(filename, epsilon=0.85):
     """
-    Read the specified file and construct a graph where node j points to
-    node i with weight w if team j was defeated by team i in w games. Use the
+    Reads the specified file and constructs a graph where node j points to
+    node i with weight w if team j was defeated by team i in w games. Uses the
     DiGraph class and its itersolve() method to compute the PageRank values of
-    the teams, then rank them with get_ranks().
+    the teams, then ranks them with get_ranks().
 
     Each line of the file has the format
         A,B
@@ -233,19 +221,16 @@ def rank_ncaa_teams(filename, epsilon=0.85):
         
         info = line.split(",")
         winner, loser = info[0], info[1]
-        row, col = indices[winner], indices[loser]
-        
+        row, col = indices[winner], indices[loser] 
         A[row, col] += 1
         
     # put into graph object
-    graph = DiGraph(A, labels = sites)
+    graph = DiGraph(A, labels = sites) 
 
     # return ranked teams via page-rank
     return get_ranks(graph.itersolve(epsilon = epsilon)) 
     
-    
 
-# Problem 6
 def rank_actors(filename="top250movies.txt", epsilon=0.85):
     """
     Read the specified file and construct a graph where node a points to
@@ -258,7 +243,8 @@ def rank_actors(filename="top250movies.txt", epsilon=0.85):
     meaning actor2 and actor3 should each have an edge pointing to actor1,
     and actor3 should have an edge pointing to actor2.
     """
-    graph = nx.DiGraph() # instantiate graph
+    # init graph object 
+    graph = nx.DiGraph() 
     
     # read in the data
     with open(filename, "r", encoding = "utf-8") as myfile:
@@ -284,4 +270,5 @@ def rank_actors(filename="top250movies.txt", epsilon=0.85):
                     
     dictionary = nx.pagerank(graph, alpha = epsilon)
     
-    return get_ranks(dictionary) # return ranks of actors via page-rank
+    # return ranks of actors via page-rank 
+    return get_ranks(dictionary)
